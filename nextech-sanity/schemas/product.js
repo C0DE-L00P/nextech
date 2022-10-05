@@ -32,6 +32,21 @@ export default {
       type: "number",
     },
     {
+      name: "discounted",
+      title: "Discounted",
+      type: "number",
+    },
+    {
+      name: "rate",
+      title: "Rate",
+      type: "number",
+    },
+    {
+      name: "reviews",
+      title: "Reviews",
+      type: "number",
+    },
+    {
       name: "details",
       title: "Details",
       type: "string",

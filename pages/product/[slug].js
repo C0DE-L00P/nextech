@@ -1,13 +1,36 @@
 import React, { useState } from "react";
-import { Product } from "../../components"
-import { AiOutlineMinus, AiOutlinePlus, AiFillStar, AiOutlineStar } from 'react-icons/ai';
-import { client, urlFor } from '../../lib/client';
+import { Product } from "../../components";
+import {
+  AiOutlineMinus,
+  AiOutlinePlus,
+} from "react-icons/ai";
+import { BsStar, BsStarHalf, BsStarFill } from "react-icons/bs";
+import { client, urlFor } from "../../lib/client";
 import { useStateContext } from "../../context/StateContext";
 
 const ProductDetails = ({ product, products }) => {
-  const { image, price, slug, name ,details } = product;
-  const { onAdd, incQty, decQty, qty } = useStateContext()
+  const { image, price, slug, name, details } = product;
+  const { onAdd, incQty, decQty, qty, setQty } = useStateContext();
   const [index, setIndex] = useState(0);
+
+  //Manage Rating stars
+  const stars = [];
+  const formStars = () => {
+    if (product.rate) {
+      for (let i = 0; i < Math.floor(product.rate); i++) {
+        stars.push(<BsStarFill key={'f'+i}/>);
+      }
+      if (product.rate != Number.parseInt(product.rate))
+        stars.push(<BsStarHalf key={'h'}/>);
+
+      for (let i = Math.ceil(product.rate); i < 5; i++) {
+        stars.push(<BsStar key={'o'+i}/>);
+      }
+    } else 
+    stars.push(...[<BsStar key={'o1'}/>,<BsStar key={'o2'}/>,<BsStar key={'o3'}/>,<BsStar key={'o4'}/>,<BsStar key={'o5'}/>])
+  };
+  formStars();
+
   return (
     <div>
       <div className="product-detail-container">
@@ -26,7 +49,7 @@ const ProductDetails = ({ product, products }) => {
                 className={
                   i === index ? "small-image selected-image" : "small-image"
                 }
-                onMouseEnter={() => setIndex(i)}
+              onMouseEnter={() => setIndex(i)}
               />
             ))}
           </div>
@@ -35,14 +58,8 @@ const ProductDetails = ({ product, products }) => {
         <div className="product-detail-desc">
           <h1>{name}</h1>
           <div className="reviews">
-            <div>
-              <AiFillStar />
-              <AiFillStar />
-              <AiFillStar />
-              <AiFillStar />
-              <AiOutlineStar />
-            </div>
-            <p>(20)</p>
+            <div>{stars}</div>
+            <p>({product.reviews??0})</p>
           </div>
           <h4>Details: </h4>
           <p>{details}</p>
@@ -51,11 +68,11 @@ const ProductDetails = ({ product, products }) => {
             <h3>Quantity:</h3>
             <p className="quantity-desc">
               <span className="minus" onClick={decQty.bind(this)}>
-                <AiOutlineMinus />
+                <AiOutlineMinus color="grey" />
               </span>
               <span className="num">{qty}</span>
               <span className="plus" onClick={incQty.bind(this)}>
-                <AiOutlinePlus />
+                <AiOutlinePlus color="grey" />
               </span>
             </p>
           </div>
@@ -63,7 +80,10 @@ const ProductDetails = ({ product, products }) => {
             <button
               type="button"
               className="add-to-cart"
-              onClick={onAdd.bind(this, product, qty)}
+              onClick={() => {
+                onAdd(product, qty);
+                setQty(1);
+              }}
             >
               Add to Cart
             </button>
@@ -99,7 +119,7 @@ export const getStaticPaths = async () => {
   //NOTICE: Down below we was asking for the whole product WHICH HAS slug == ${slug}
   const query = `*[_type == "product"] {slug {current}}`;
   const products = await client.fetch(query);
-  
+
   const paths = products.map((product) => ({
     params: {
       slug: product.slug.current,
@@ -115,7 +135,7 @@ export const getStaticPaths = async () => {
 export const getStaticProps = async ({ params: { slug } }) => {
   let productQ = `*[_type == "product" && slug.current == '${slug}'][0]`;
   let product = await client.fetch(productQ);
-  console.log('prod',product)
+  console.log("prod", product);
 
   let productsQ = `*[_type == "product"]`;
   let products = await client.fetch(productsQ);

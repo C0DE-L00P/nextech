@@ -27,8 +27,8 @@ const StateContext = ({ children }) => {
 
     if (!found) {
       //ITEM NOT FOUND THEN ADD IT
-      product.quantity = quantity;
-      setCartItems((prevItems) => [...prevItems, product]);
+      // product.quantity = quantity;
+      setCartItems((prevItems) => [...prevItems, {...product,quantity}]);
     } else {
       //FOUND IN CART just add quantity
       const updatedCartItems = cartItems.map((cartProduct) => {
@@ -38,7 +38,10 @@ const StateContext = ({ children }) => {
             quantity: cartProduct.quantity + quantity,
           };
       });
-      setCartItems(updatedCartItems);
+      setCartItems(() => {
+        console.log("cartItems", updatedCartItems);
+        return updatedCartItems;
+      });
     }
 
     toast.success(`${qty} ${product.name} added to the cart.`);
@@ -48,14 +51,13 @@ const StateContext = ({ children }) => {
     //FIRST check if the item in the cart
     const found = cartItems?.find((item) => item._id === product._id);
     if (!found) return toast.error("No Such item in the cart");
-    
 
     //SECOND remove its quantity and price from total
     setTotalPrice((prevPrice) => prevPrice - product.quantity * product.price);
     setTotalQuantities((prevQty) => prevQty - product.quantity);
 
     //THIRD just filter the cartItems
-    setCartItems(prev => prev?.filter((i) => i._id !== product._id))
+    setCartItems((prev) => prev?.filter((i) => i._id !== product._id));
 
     //FORTH set the new itemsList
   };
@@ -81,7 +83,7 @@ const StateContext = ({ children }) => {
     setTotalQuantities((prevTotal) => prevTotal + change);
 
     //update cart
-    cartItems[index].quantity += change
+    cartItems[index].quantity += change;
     setCartItems(cartItems);
   };
 
@@ -97,6 +99,7 @@ const StateContext = ({ children }) => {
         decQty,
         onAdd,
         onRemove,
+        setQty,
         toggleCartItemQuanitity,
         setShowCart,
         setCartItems,

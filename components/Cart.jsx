@@ -1,4 +1,4 @@
-import React, { useRef, useState,useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useStateContext } from "../context/StateContext";
 import { urlFor } from "../lib/client";
 import {
@@ -12,8 +12,8 @@ import toast from "react-hot-toast";
 import Link from "next/link";
 
 const Cart = () => {
-  const [animate,setAnimate] = useState(false)
-  
+  const [animate, setAnimate] = useState(false);
+
   const cartRef = useRef();
   const {
     totalPrice,
@@ -26,24 +26,39 @@ const Cart = () => {
   } = useStateContext();
 
   useEffect(() => {
-    setTimeout(()=>{
-      setAnimate(showCart)
-    },100)
-  }, [showCart])
-  
+    setTimeout(() => {
+      setAnimate(showCart);
+    }, 100);
+  }, [showCart]);
+
+  const TRANSITION_DELAY = 0.2,
+    TRANSITION_DURATION = 0.5;
 
   return (
     <div
       className="cart-wrapper"
       ref={cartRef}
+      onClick={(e) => {
+        if (e.target == e.currentTarget) {
+          setAnimate(false);
+          setTimeout(() => setShowCart(false), TRANSITION_DURATION * 1000);
+        }
+      }}
     >
-      <div className="cart-container"
-      style={{transform: animate? 'translateX(0px)': 'translateX(600px)', transitionDuration: '.3s'}}
+      <div
+        className="cart-container"
+        style={{
+          transform: animate ? "translateX(0px)" : "translateX(600px)",
+          transitionDuration: `${TRANSITION_DURATION}s`,
+        }}
       >
         <button
           type="button"
           className="cart-heading"
-          onClick={() => setShowCart(false)}
+          onClick={() => {
+            setAnimate(false);
+            setTimeout(() => setShowCart(false), TRANSITION_DURATION * 1000);
+          }}
         >
           <AiOutlineLeft />
           <span className="heading">Your Cart</span>
@@ -56,7 +71,13 @@ const Cart = () => {
             <h3>Your shopping bag is empty</h3>
             <button
               type="button"
-              onClick={() => setShowCart(false)}
+              onClick={() => {
+                setAnimate(false);
+                setTimeout(
+                  () => setShowCart(false),
+                  TRANSITION_DURATION * 1000
+                );
+              }}
               className="btn"
             >
               Continue Shopping
@@ -66,16 +87,27 @@ const Cart = () => {
 
         <div className="product-container">
           {cartItems?.length >= 1 &&
-            cartItems?.map((item) => (
-              <div className="product" key={item._id}>
-                <img
-                  src={urlFor(item?.image[0])}
-                  className="cart-product-image"
-                />
+            cartItems?.map((item, index) => (
+              <div
+                className="product"
+                key={item?._id}
+                style={{
+                  transform: animate ? "translateX(0px)" : "translateX(140px)",
+                  opacity: animate ? 1 : 0,
+                  transitionDuration: `0.9s`,
+                  transitionDelay: `${TRANSITION_DELAY + index * 0.1}s`,
+                }}
+              >
+                {item && (
+                  <img
+                    src={urlFor(item?.image[0])}
+                    className="cart-product-image"
+                  />
+                )}
                 <div className="item-desc">
                   <div className="flex top">
-                    <h5>{item.name}</h5>
-                    <h4>${item.price}</h4>
+                    <h5>{item?.name}</h5>
+                    <h4>${item?.price}</h4>
                   </div>
                   <div className="flex bottom">
                     <div>
@@ -83,19 +115,19 @@ const Cart = () => {
                         <span
                           className="minus"
                           onClick={() =>
-                            toggleCartItemQuanitity(item._id, "dec")
+                            toggleCartItemQuanitity(item?._id, "dec")
                           }
                         >
-                          <AiOutlineMinus />
+                          <AiOutlineMinus color="grey" />
                         </span>
-                        <span className="num">{item.quantity}</span>
+                        <span className="num">{item?.quantity}</span>
                         <span
                           className="plus"
                           onClick={() =>
-                            toggleCartItemQuanitity(item._id, "inc")
+                            toggleCartItemQuanitity(item?._id, "inc")
                           }
                         >
-                          <AiOutlinePlus />
+                          <AiOutlinePlus color="grey" />
                         </span>
                       </p>
                     </div>

@@ -10,13 +10,14 @@ const HeroBanner = ({
     desc,
     smallText,
     midText,
+    slug,
     largeText1,
     largeText2,
     discount,
     saleTime,
   },
 }) => {
-  console.log(image)
+  console.log(slug)
   return (
     <div className="hero-banner-container">
       <div>
@@ -25,7 +26,7 @@ const HeroBanner = ({
         <h1>{largeText1}</h1>
         <img alt="banner-img" src={urlFor(image)} className="hero-banner-image"/>
         <div>
-          <Link href={`/product/${product}`}>
+          <Link href={`/product/${slug.current}`}>
             <button type="button">{buttonText}</button>
           </Link>
           <div className="desc">

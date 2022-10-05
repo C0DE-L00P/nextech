@@ -6,8 +6,8 @@ const Footer = () => {
     <div className="footer-container">
       <p>2022 NEXTECH Electronics All rights reserverd</p>
       <p className="icons">
-        <AiFillInstagram />
-        <AiOutlineTwitter />
+        <AiFillInstagram style={{cursor: 'pointer'}}/>
+        <AiOutlineTwitter style={{cursor: 'pointer'}}/>
       </p>
     </div>
   )

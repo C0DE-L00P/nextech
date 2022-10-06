@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import { Product } from "../../components";
-import {
-  AiOutlineMinus,
-  AiOutlinePlus,
-} from "react-icons/ai";
+import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { BsStar, BsStarHalf, BsStarFill } from "react-icons/bs";
 import { client, urlFor } from "../../lib/client";
 import { useStateContext } from "../../context/StateContext";
+import useStripe from "../../lib/useStripe";
+import toast from "react-hot-toast";
 
 const ProductDetails = ({ product, products }) => {
-  const { image, price, slug, name, details } = product;
+  const { image, price, slug, name, details, discounted } = product;
   const { onAdd, incQty, decQty, qty, setQty } = useStateContext();
   const [index, setIndex] = useState(0);
 
@@ -18,18 +17,46 @@ const ProductDetails = ({ product, products }) => {
   const formStars = () => {
     if (product.rate) {
       for (let i = 0; i < Math.floor(product.rate); i++) {
-        stars.push(<BsStarFill key={'f'+i}/>);
+        stars.push(<BsStarFill key={"f" + i} />);
       }
       if (product.rate != Number.parseInt(product.rate))
-        stars.push(<BsStarHalf key={'h'}/>);
+        stars.push(<BsStarHalf key={"h"} />);
 
       for (let i = Math.ceil(product.rate); i < 5; i++) {
-        stars.push(<BsStar key={'o'+i}/>);
+        stars.push(<BsStar key={"o" + i} />);
       }
-    } else 
-    stars.push(...[<BsStar key={'o1'}/>,<BsStar key={'o2'}/>,<BsStar key={'o3'}/>,<BsStar key={'o4'}/>,<BsStar key={'o5'}/>])
+    } else
+      stars.push(
+        ...[
+          <BsStar key={"o1"} />,
+          <BsStar key={"o2"} />,
+          <BsStar key={"o3"} />,
+          <BsStar key={"o4"} />,
+          <BsStar key={"o5"} />,
+        ]
+      );
   };
   formStars();
+  
+  const handleBuyNow = async ()=>{
+    const stripe = await useStripe()
+    
+    toast.loading('Redirecting...')
+    const res = await fetch('/api/stripe',{
+      method: 'POST',
+      headers: {
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify([{...product, quantity: qty}])
+    })
+
+    if(res.status !== 200) return toast.error("Something went wrong")
+    const data = await res.json()
+
+    localStorage.setItem('checkoutState', 'individual')
+
+    stripe.redirectToCheckout({sessionId: data.id})
+  }
 
   return (
     <div>
@@ -49,7 +76,7 @@ const ProductDetails = ({ product, products }) => {
                 className={
                   i === index ? "small-image selected-image" : "small-image"
                 }
-              onMouseEnter={() => setIndex(i)}
+                onMouseEnter={() => setIndex(i)}
               />
             ))}
           </div>
@@ -59,11 +86,29 @@ const ProductDetails = ({ product, products }) => {
           <h1>{name}</h1>
           <div className="reviews">
             <div>{stars}</div>
-            <p>({product.reviews??0})</p>
+            <p>({product.reviews ?? 0})</p>
           </div>
           <h4>Details: </h4>
           <p>{details}</p>
-          <p className="price">${price}</p>
+          <span>
+            <span
+              className="price"
+              style={
+                discounted && {
+                  textDecoration: "line-through",
+                  fontSize: "1.2rem",
+                  color: "grey",
+                }
+              }
+            >
+              {price} AED
+            </span>
+            {discounted && (
+              <span className="price" style={{ marginInlineStart: 8 }}>
+                {discounted} AED
+              </span>
+            )}
+          </span>
           <div className="quantity">
             <h3>Quantity:</h3>
             <p className="quantity-desc">
@@ -87,11 +132,7 @@ const ProductDetails = ({ product, products }) => {
             >
               Add to Cart
             </button>
-            <button
-              type="button"
-              className="buy-now"
-              onClick={console.log.bind(this, "buy now")}
-            >
+            <button type="button" className="buy-now" onClick={handleBuyNow.bind(this)}>
               Buy Now
             </button>
           </div>

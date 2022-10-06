@@ -9,6 +9,18 @@ const StateContext = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [qty, setQty] = useState(1);
 
+  //get Your Stored items
+  useEffect(() => {
+    let itemsFromLocal = JSON.parse(localStorage.getItem("cart")) ?? [];
+    if (itemsFromLocal && itemsFromLocal.length) {
+      setCartItems(itemsFromLocal);
+
+      //Calc totals
+      setTotalPrice(()=>itemsFromLocal?.reduce((res, i) => res + i.price * i.quantity,0));
+      setTotalQuantities(()=>itemsFromLocal?.reduce((res, i) => res + i.quantity,0));
+    }
+  }, []);
+
   const incQty = () => setQty((prevQty) => prevQty + 1);
   const decQty = () =>
     setQty((prevQty) => {
@@ -28,22 +40,28 @@ const StateContext = ({ children }) => {
     if (!found) {
       //ITEM NOT FOUND THEN ADD IT
       // product.quantity = quantity;
-      setCartItems((prevItems) => [...prevItems, {...product,quantity}]);
+      setCartItems((prevItems) => {
+        localStorage.setItem(
+          "cart",
+          JSON.stringify([...prevItems, { ...product, quantity }])
+        );
+        return [...prevItems, { ...product, quantity }];
+      });
     } else {
       //FOUND IN CART just add quantity
       const updatedCartItems = cartItems.map((cartProduct) => {
-        if (cartProduct._id === product._id)
-          return {
-            ...cartProduct,
-            quantity: cartProduct.quantity + quantity,
-          };
+        return cartProduct._id === product._id
+          ? {
+              ...cartProduct,
+              quantity: cartProduct.quantity + quantity,
+            }
+          : cartProduct;
       });
       setCartItems(() => {
-        console.log("cartItems", updatedCartItems);
+        localStorage.setItem("cart", JSON.stringify(updatedCartItems));
         return updatedCartItems;
       });
     }
-
     toast.success(`${qty} ${product.name} added to the cart.`);
   };
 

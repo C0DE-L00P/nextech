@@ -9,11 +9,10 @@ import {
 } from "react-icons/ai";
 import { TiDeleteOutline } from "react-icons/ti";
 import toast from "react-hot-toast";
-import Link from "next/link";
+import useStripe from '../lib/useStripe'
 
 const Cart = () => {
   const [animate, setAnimate] = useState(false);
-
   const cartRef = useRef();
   const {
     totalPrice,
@@ -30,6 +29,23 @@ const Cart = () => {
       setAnimate(showCart);
     }, 100);
   }, [showCart]);
+  
+  const handleCheckout = async () => {
+    toast.loading('Redirecting... ')
+    const stripe = await useStripe()
+    const request = await fetch('/api/stripe',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(cartItems)
+    })
+
+    if(request.status !== 200) return toast.error(request.statusText)
+    const data = await request.json()
+
+    stripe.redirectToCheckout({sessionId: data.id})
+  }
 
   const TRANSITION_DELAY = 0.2,
     TRANSITION_DURATION = 0.5;
@@ -107,7 +123,7 @@ const Cart = () => {
                 <div className="item-desc">
                   <div className="flex top">
                     <h5>{item?.name}</h5>
-                    <h4>${item?.price}</h4>
+                    <h4>{item?.price} AED</h4>
                   </div>
                   <div className="flex bottom">
                     <div>
@@ -147,10 +163,10 @@ const Cart = () => {
           <div className="cart-bottom">
             <div className="total">
               <h3>Subtotal:</h3>
-              <h3>${totalPrice}</h3>
+              <h3>{totalPrice} AED</h3>
             </div>
             <div className="btn-container">
-              <button type="button" className="btn">
+              <button type="button" className="btn" onClick={handleCheckout}>
                 Pay with Stripe
               </button>
             </div>

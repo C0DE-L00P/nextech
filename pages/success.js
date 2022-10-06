@@ -1,24 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { BsBagCheckFill } from 'react-icons/bs';
-
-import { useStateContext } from '../context/StateContext';
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { BsBagCheckFill } from "react-icons/bs";
+import { useStateContext } from "../context/StateContext";
 
 const Success = () => {
   const { setCartItems, setTotalPrice, setTotalQuantities } = useStateContext();
-  
+
   useEffect(() => {
-    localStorage.clear();
-    setCartItems([]);
-    setTotalPrice(0);
-    setTotalQuantities(0);
+    if (!localStorage.getItem("checkoutState") || localStorage.getItem("checkoutState") !== "individual") {
+      localStorage.clear();
+      setCartItems([]);
+      setTotalPrice(0);
+      setTotalQuantities(0);
+    }else localStorage.removeItem('checkoutState')
   }, []);
 
   return (
     <div className="success-wrapper">
       <div className="success">
         <p className="icon">
-          <BsBagCheckFill color='#324d67' size={100}/>
+          <BsBagCheckFill color="#324d67" size={100} />
         </p>
         <h2>Thank you for your order!</h2>
         <p className="email-msg">Check your email inbox for the receipt.</p>
@@ -35,7 +36,7 @@ const Success = () => {
         </Link>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Success
+export default Success;

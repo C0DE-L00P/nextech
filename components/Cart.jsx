@@ -9,7 +9,8 @@ import {
 } from "react-icons/ai";
 import { TiDeleteOutline } from "react-icons/ti";
 import toast from "react-hot-toast";
-import useStripe from '../lib/useStripe'
+import getStripe from '../lib/getStripe'
+import Image from "next/image";
 
 const Cart = () => {
   const [animate, setAnimate] = useState(false);
@@ -32,7 +33,7 @@ const Cart = () => {
   
   const handleCheckout = async () => {
     toast.loading('Redirecting... ')
-    const stripe = await useStripe()
+    const stripe = await getStripe()
     const request = await fetch('/api/stripe',{
       method: 'POST',
       headers: {
@@ -101,7 +102,7 @@ const Cart = () => {
           </div>
         )}
 
-        <div className="product-container">
+        <div className="product-container" style={{ paddingBottom: 100}}>
           {cartItems?.length >= 1 &&
             cartItems?.map((item, index) => (
               <div
@@ -115,7 +116,8 @@ const Cart = () => {
                 }}
               >
                 {item && (
-                  <img
+                  <Image
+                  alt="cart-product-image"
                     src={urlFor(item?.image[0])}
                     className="cart-product-image"
                   />

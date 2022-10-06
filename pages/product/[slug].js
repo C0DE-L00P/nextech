@@ -4,8 +4,9 @@ import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { BsStar, BsStarHalf, BsStarFill } from "react-icons/bs";
 import { client, urlFor } from "../../lib/client";
 import { useStateContext } from "../../context/StateContext";
-import useStripe from "../../lib/useStripe";
+import getStripe from "../../lib/getStripe";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 const ProductDetails = ({ product, products }) => {
   const { image, price, slug, name, details, discounted } = product;
@@ -39,7 +40,7 @@ const ProductDetails = ({ product, products }) => {
   formStars();
   
   const handleBuyNow = async ()=>{
-    const stripe = await useStripe()
+    const stripe = await getStripe()
     
     toast.loading('Redirecting...')
     const res = await fetch('/api/stripe',{
@@ -63,14 +64,16 @@ const ProductDetails = ({ product, products }) => {
       <div className="product-detail-container">
         <div>
           <div className="image-container">
-            <img
+            <Image
+            alt="product-detail-image"
               src={urlFor(image && image[index])}
               className="product-detail-image"
             />
           </div>
           <div className="small-images-container">
             {image?.map((item, i) => (
-              <img
+              <Image
+              alt="small-image"
                 key={i}
                 src={urlFor(item)}
                 className={

@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Footer, FooterBan, HeroBanner, Product } from "../components";
+import React from "react";
+import { FooterBan, HeroBanner, Product } from "../components";
 import { client } from "../lib/client";
 
 const Home = ({products, banners}) => {

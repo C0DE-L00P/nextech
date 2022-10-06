@@ -64,7 +64,7 @@ const ProductDetails = ({ product, products }) => {
       <div className="product-detail-container">
         <div>
           <div className="image-container">
-            <Image
+            <img
             alt="product-detail-image"
               src={urlFor(image && image[index])}
               className="product-detail-image"
@@ -72,7 +72,7 @@ const ProductDetails = ({ product, products }) => {
           </div>
           <div className="small-images-container">
             {image?.map((item, i) => (
-              <Image
+              <img
               alt="small-image"
                 key={i}
                 src={urlFor(item)}

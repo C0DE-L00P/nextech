@@ -116,7 +116,7 @@ const Cart = () => {
                 }}
               >
                 {item && (
-                  <Image
+                  <img
                   alt="cart-product-image"
                     src={urlFor(item?.image[0])}
                     className="cart-product-image"

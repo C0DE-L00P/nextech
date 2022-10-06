@@ -25,7 +25,7 @@ const HeroBanner = ({
         <p className="beats-solo">{smallText}</p>
         <h3>{midText}</h3>
         <h1>{largeText1}</h1>
-        <Image alt="banner-img" src={urlFor(image)} className="hero-banner-image"/>
+        <img alt="banner-img" src={urlFor(image)} className="hero-banner-image"/>
         <div>
           <Link href={`/product/${slug.current}`}>
             <button type="button">{buttonText}</button>

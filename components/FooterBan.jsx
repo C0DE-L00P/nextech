@@ -37,7 +37,7 @@ const FooterBan = ({
           </Link>
         </div>
 
-        <Image src={urlFor(image)} className="footer-banner-image" alt="footer-banner-image"/>
+        <img src={urlFor(image)} className="footer-banner-image" alt="footer-banner-image"/>
       </div>
     </div>
   );
